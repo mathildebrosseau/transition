@@ -53,7 +53,7 @@ export const setupServer = (app: Express) => {
     directoryManager.createDirectoryIfNotExists('osrm');
     directoryManager.createDirectoryIfNotExists('valhalla');
     directoryManager.createDirectoryIfNotExists('userData');
-    
+
     const indexPath = path.join(
         publicDistDirectory,
         `index-${projectShortname}${process.env.NODE_ENV === 'test' ? '_test' : ''}.html`

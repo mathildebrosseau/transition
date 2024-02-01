@@ -70,7 +70,7 @@ export default <U extends IUserModel>(passport: PassportStatic, authModel: IAuth
                     query = 'username = ? OR email = ? OR facebook_id = ? OR google_id = ?'; //password ? `(username = '${usernameOrEmail}' OR email = '${usernameOrEmail}') AND password = crypt('${password}', password)` : `(username = '${usernameOrEmail}' OR email = '${usernameOrEmail}')`;
                     binding = [usernameOrEmail, usernameOrEmail, usernameOrEmail, usernameOrEmail];
                 } */
-                console.log("Local-login strategy")
+                console.log('Local-login strategy');
                 authModel
                     .find({ usernameOrEmail: usernameOrEmail })
                     .then(async (model) => {
@@ -106,7 +106,7 @@ export default <U extends IUserModel>(passport: PassportStatic, authModel: IAuth
                 password: string,
                 done: (error: any, user?: any, options?: LocalStrategy.IVerifyOptions) => void
             ) => {
-                console.log("api-login strategy")
+                console.log('api-login strategy');
                 authModel
                     .find({ usernameOrEmail: usernameOrEmail })
                     .then(async (model) => {
