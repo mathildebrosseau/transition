@@ -175,17 +175,17 @@ export default function (app: express.Express, passport: PassportStatic) {
     });
 
     router.post('/paths', async (req, res) => {
-        const geojson = await transitObjectEndpointDefinitions.paths.geojsonCollection!();
+        const geojson = await transitObjectDataHandlers.paths.geojsonCollection!();
         res.json(geojson);
     });
 
     router.post('/nodes', async (req, res) => {
-        const geojson = await transitObjectEndpointDefinitions.nodes.geojsonCollection!();
+        const geojson = await transitObjectDataHandlers.nodes.geojsonCollection!();
         res.json(geojson);
     });
 
     router.post('/scenarios', async (req, res) => {
-        const attributes = await transitObjectEndpointDefinitions.scenarios.collection!(null);
+        const attributes = await transitObjectDataHandlers.scenarios.collection!(null);
         res.json(attributes);
     });
 
