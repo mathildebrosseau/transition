@@ -167,4 +167,10 @@ export default function (app: express.Express, passport: PassportStatic) {
     });
 
     app.use('/api', router);
+
+    router.use('/', passport.authenticate('api-login', { failWithError: true, failureMessage: true }))
+    
+    router.get('/',(req, res) => {
+        res.send('The public API endpoint works!');
+    });
 }
