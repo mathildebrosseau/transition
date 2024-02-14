@@ -4,6 +4,7 @@
  * This file is licensed under the MIT License.
  * License text available at https://opensource.org/licenses/MIT
  */
+<<<<<<< HEAD
 import express, { RequestHandler } from 'express';
 import publicRoutes from '../public.routes';
 import passport from 'passport'
@@ -21,11 +22,26 @@ jest.mock('../../services/routingCalculation/RoutingCalculator');
 jest.mock('transition-common/lib/services/accessibilityMap/TransitAccessibilityMapRouting');
 jest.mock('transition-common/lib/services/transitRouting/TransitRouting');
 jest.mock('passport');
+=======
+import request from 'supertest';
+import express from 'express';
+import publicRoutes from '../public.routes';
+import passport from 'passport';
+
+// Mock passport (therefore ignoring authentication)
+jest.mock('passport');
+(passport.authenticate as jest.Mock).mockImplementation(() => {
+    return (req, res, next) => {
+        next();
+    }
+});
+>>>>>>> 59c31f9 (public.routes.test.ts: Refactored to make it easier to add more tests later)
 
 beforeEach(() => {
     jest.clearAllMocks();
 });
 
+<<<<<<< HEAD
 test('Passport bearer-strategy middleware setup', () => {
     (passport.authenticate as jest.Mock).mockImplementation(() => {
         return (req, res, next) => {
@@ -458,4 +474,21 @@ describe('Testing API endpoints', () => {
         expect(response.status).toStrictEqual(500);
         expect(calculateRoute).toBeCalled();
     });
+=======
+test('Authentication setup', () => {
+    publicRoutes(express(), passport);
+    expect(passport.authenticate).toBeCalledWith('api-strategy', {"failWithError": true, "failureMessage": true});
+});
+
+describe('Testing endpoints', () => {
+    const app = express();
+    publicRoutes(app, passport);
+
+    test('POST /api', async () => {
+        const response = await request(app).post('/api');
+
+        expect(response.status).toStrictEqual(200);
+        expect(response.text).toStrictEqual('The public API endpoint works!');
+    });
+>>>>>>> 59c31f9 (public.routes.test.ts: Refactored to make it easier to add more tests later)
 });
