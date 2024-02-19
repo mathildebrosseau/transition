@@ -190,4 +190,6 @@ export default function (app: express.Express, passport: PassportStatic) {
         routingModes.push('transit');
         res.json(routingModes);
     });
+
+    app.use('/api', router);
 }
