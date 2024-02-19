@@ -27,6 +27,7 @@ beforeEach(() => {
 });
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 test('Passport bearer-strategy middleware setup', () => {
     (passport.authenticate as jest.Mock).mockImplementation(() => {
         return (req, res, next) => {
@@ -464,16 +465,32 @@ test('Authentication setup', () => {
     publicRoutes(express(), passport);
     expect(passport.authenticate).toBeCalledWith('api-strategy', {"failWithError": true, "failureMessage": true});
 });
+=======
+describe("token - endpoint", () => {
+    test('Bypass Authentication - Return value', async () => {
+>>>>>>> 241bdeb (api-authentication: add new migrations, auth middleware to endpoints and passport strategy)
 
-describe('Testing endpoints', () => {
-    const app = express();
-    publicRoutes(app, passport);
 
-    test('POST /api', async () => {
-        const response = await request(app).post('/api');
+        const passStub = jest.fn().mockImplementation((strategy, options) => {
+            return (req, res, next) => {
+                next();
+            };
+        });
 
-        expect(response.status).toStrictEqual(200);
-        expect(response.text).toStrictEqual('The public API endpoint works!');
+        const queryStub = jest.fn().mockImplementation((username)=>{
+            return "this-is-a-token"
+        })
+
+        tokensDbQueries.getById = queryStub
+        
+        passport.authenticate = passStub
+        
+        publicRoutes(mockApp, passport)
+
+    const response = await supertest(mockApp).get("/token/")
+
+    expect(response.status).toEqual(200);
+    expect(passStub).toBeCalledWith('local-login', {"failWithError": true, "failureMessage": true})
     });
 <<<<<<< HEAD
 >>>>>>> 59c31f9 (public.routes.test.ts: Refactored to make it easier to add more tests later)
@@ -483,7 +500,7 @@ describe('Testing endpoints', () => {
     test('POST /api/paths', async () => {
         transitObjectDataHandlers.paths.geojsonCollection! = jest.fn();
 
-        const response = await request(app).post('/api/paths');
+        const response = await request(mockApp).post('/api/paths');
 
         expect(response.status).toStrictEqual(200);
         expect(transitObjectDataHandlers.paths.geojsonCollection!).toBeCalled();
@@ -492,7 +509,7 @@ describe('Testing endpoints', () => {
     test('POST /api/nodes', async () => {
         transitObjectDataHandlers.nodes.geojsonCollection! = jest.fn();
 
-        const response = await request(app).post('/api/nodes');
+        const response = await request(mockApp).post('/api/nodes');
 
         expect(response.status).toStrictEqual(200);
         expect(transitObjectDataHandlers.nodes.geojsonCollection!).toBeCalled();
@@ -501,7 +518,7 @@ describe('Testing endpoints', () => {
     test('POST /api/scenarios', async () => {
         transitObjectDataHandlers.scenarios.collection! = jest.fn();
 
-        const response = await request(app).post('/api/scenarios');
+        const response = await request(mockApp).post('/api/scenarios');
         
         expect(response.status).toStrictEqual(200);
         expect(transitObjectDataHandlers.scenarios.collection!).toBeCalledWith(null);
@@ -510,11 +527,32 @@ describe('Testing endpoints', () => {
     test('POST /api/routing-modes', async () => {
         osrmProcessManager.availableRoutingModes = jest.fn(() => Promise.resolve([]));
 
-        const response = await request(app).post('/api/routing-modes');
+        const response = await request(mockApp).post('/api/routing-modes');
 
         expect(response.status).toStrictEqual(200);
         expect(response.body).toStrictEqual(['transit']);
         expect(osrmProcessManager.availableRoutingModes).toBeCalled();
     });
 });
+<<<<<<< HEAD
 >>>>>>> 7e23773 (public.routes.test.ts: Added tests for all public endpoints)
+=======
+
+
+test('Authentication setup', () => {
+    publicRoutes(express(), passport);
+    expect(passport.authenticate).toBeCalledWith('local-login', {"failWithError": true, "failureMessage": true});
+});
+
+// describe('Testing endpoints', () => {
+//     const app = express();
+//     publicRoutes(app, passport);
+
+//     test('POST /api', async () => {
+//         const response = await request(app).post('/api');
+
+//         expect(response.status).toStrictEqual(200);
+//         expect(response.text).toStrictEqual('The public API endpoint works!');
+//     });
+// });
+>>>>>>> 241bdeb (api-authentication: add new migrations, auth middleware to endpoints and passport strategy)

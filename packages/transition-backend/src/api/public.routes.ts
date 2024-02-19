@@ -168,28 +168,24 @@ export default function (app: express.Express, passport: PassportStatic) {
 
     app.use('/api', router);
 
-    router.use('/', passport.authenticate('api-strategy', { failWithError: true, failureMessage: true }));
+    router.use('/', passport.authenticate('bearer-strategy', { session: false }));
 
-    router.post('/', (req, res) => {
-        res.send('The public API endpoint works!');
-    });
-
-    router.post('/paths', async (req, res) => {
+    router.get('/paths', async (req, res) => {
         const geojson = await transitObjectDataHandlers.paths.geojsonCollection!();
         res.json(geojson);
     });
 
-    router.post('/nodes', async (req, res) => {
+    router.get('/nodes', async (req, res) => {
         const geojson = await transitObjectDataHandlers.nodes.geojsonCollection!();
         res.json(geojson);
     });
 
-    router.post('/scenarios', async (req, res) => {
+    router.get('/scenarios', async (req, res) => {
         const attributes = await transitObjectDataHandlers.scenarios.collection!(null);
         res.json(attributes);
     });
 
-    router.post('/routing-modes', async (req, res) => {
+    router.get('/routing-modes', async (req, res) => {
         const routingModes: RoutingOrTransitMode[] = await osrmProcessManager.availableRoutingModes();
         routingModes.push('transit');
         res.json(routingModes);
