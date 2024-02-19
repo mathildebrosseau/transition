@@ -130,8 +130,7 @@ export default <U extends IUserModel>(passport: PassportStatic, authModel: IAuth
                         return;
                     });
             }
-          }
-        )
+        })
     );
 
     passport.use(

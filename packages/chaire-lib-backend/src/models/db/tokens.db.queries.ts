@@ -5,7 +5,6 @@
  * License text available at https://opensource.org/licenses/MIT
  */
 import knex from '../../config/shared/db.config';
-<<<<<<< HEAD
 import { exists, update, deleteRecord } from './default.db.queries';
 import TrError from 'chaire-lib-common/lib/utils/TrError';
 import { randomUUID } from 'crypto';
@@ -18,34 +17,13 @@ const attributesCleaner = function (attributes: TokenAttributes): { user_id: num
     const { user_id, api_token } = attributes;
     const _attributes: any = {
         number: user_id,
-=======
-import { validate as uuidValidate } from 'uuid';
-
-import {
-    exists,
-    update,
-    deleteRecord,
-} from './default.db.queries';
-import TrError from 'chaire-lib-common/lib/utils/TrError';
-
-
-import { randomUUID } from 'crypto';
-import { TokenAttributes } from '../../services/tokens/token';
-
-const tableName = 'tokens';
-const userTableName = 'users'
-
-const attributesCleaner = function (attributes: TokenAttributes): { id: number, api_token: string } {
-    const { id, api_token } = attributes;
-    const _attributes: any = {
-        number: id,
->>>>>>> 241bdeb (api-authentication: add new migrations, auth middleware to endpoints and passport strategy)
         string: api_token
     };
 
     return _attributes;
 };
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 const attributesParser = (dbAttributes: { user_id: number; api_token: string }): TokenAttributes => ({
     user_id: dbAttributes.user_id,
@@ -54,6 +32,9 @@ const attributesParser = (dbAttributes: {
     id: number;
     api_token: string;
 }): TokenAttributes => ({
+=======
+const attributesParser = (dbAttributes: { id: number; api_token: string }): TokenAttributes => ({
+>>>>>>> 8fe263c (Fixed linting of transition-backend and chaire-lib-backend with yarn format)
     id: dbAttributes.id,
 >>>>>>> 241bdeb (api-authentication: add new migrations, auth middleware to endpoints and passport strategy)
     api_token: dbAttributes.api_token
@@ -62,12 +43,17 @@ const attributesParser = (dbAttributes: {
 const getOrCreate = async (usernameOrEmail: string): Promise<string> => {
     try {
 <<<<<<< HEAD
+<<<<<<< HEAD
         const user_id = await knex(userTableName)
+=======
+        const id = await knex(userTableName)
+>>>>>>> 8fe263c (Fixed linting of transition-backend and chaire-lib-backend with yarn format)
             .where(function () {
                 this.where('username', usernameOrEmail).orWhere('email', usernameOrEmail);
             })
             .then(async (row) => {
                 if (row === undefined) {
+<<<<<<< HEAD
                     throw new TrError(
                         `Could not match ${usernameOrEmail} in table ${tableName} database`,
                         'DBUTK0001',
@@ -80,10 +66,17 @@ const getOrCreate = async (usernameOrEmail: string): Promise<string> => {
                         'DBUTK0002',
                         'NoUserMatchError'
                     );
+=======
+                    throw 'An error has occured: No username or email to this name.';
+                }
+                if (row.length < 1) {
+                    throw 'An error has occured: No match found';
+>>>>>>> 8fe263c (Fixed linting of transition-backend and chaire-lib-backend with yarn format)
                 } else {
                     return row[0].id;
                 }
             });
+<<<<<<< HEAD
         const row = await knex(tableName).where('user_id', user_id);
         if (row[0]) {
             return row[0].api_token;
@@ -144,11 +137,16 @@ const getUserByToken = async (token: string) => {
         const apiToken = randomUUID()
         const newObject: TokenAttributes = {id: id, api_token: apiToken}
         const row = await knex(tableName).where('id', id)
+=======
+        const apiToken = randomUUID();
+        const newObject: TokenAttributes = { id: id, api_token: apiToken };
+        const row = await knex(tableName).where('id', id);
+>>>>>>> 8fe263c (Fixed linting of transition-backend and chaire-lib-backend with yarn format)
         if (row[0]) {
-            return row[0].api_token
+            return row[0].api_token;
         }
-            await knex(tableName).insert(newObject)
-        return apiToken
+        await knex(tableName).insert(newObject);
+        return apiToken;
     } catch (error) {
         throw new TrError(
             `Cannot add api_token to user ${usernameOrEmail} in table ${tableName} database (knex error: ${error})`,
@@ -204,9 +202,9 @@ const read = async (id: string) => {
     }
 };
 
-const match = async(token: string) => {
+const match = async (token: string) => {
     try {
-        const response = await knex(tableName).where("api_token", token );
+        const response = await knex(tableName).where('api_token', token);
         if (response.length > 0) {
             return true;
         }
@@ -215,21 +213,25 @@ const match = async(token: string) => {
         console.error(`cannot get token ${token} (knex error: ${error})`);
         return false;
     }
-}
+};
 
 const getUserByToken = async (token: string) => {
     try {
-        const id = await knex(tableName).where('api_token',token)[0].id;
-    
+        const id = await knex(tableName).where('api_token', token)[0].id;
+
         if (!id) {
-            throw(`No such id in ${tableName} table.`);
+            throw `No such id in ${tableName} table.`;
         }
 
-        const user = await knex(userTableName).where('id', id)[0]
+        const user = await knex(userTableName).where('id', id)[0];
 
         if (!user) {
+<<<<<<< HEAD
             throw('Error, mismatch between user and id')
 >>>>>>> 241bdeb (api-authentication: add new migrations, auth middleware to endpoints and passport strategy)
+=======
+            throw 'Error, mismatch between user and id';
+>>>>>>> 8fe263c (Fixed linting of transition-backend and chaire-lib-backend with yarn format)
         }
 
         return user;
@@ -248,8 +250,12 @@ const getUserByToken = async (token: string) => {
         console.error(`cannot get user with token: ${token} (knex error: ${error})`);
         return false;
     }
+<<<<<<< HEAD
 }
 >>>>>>> 241bdeb (api-authentication: add new migrations, auth middleware to endpoints and passport strategy)
+=======
+};
+>>>>>>> 8fe263c (Fixed linting of transition-backend and chaire-lib-backend with yarn format)
 
 export default {
     getOrCreate,
@@ -263,6 +269,10 @@ export default {
     match,
     exists: exists.bind(null, knex, tableName),
     read,
+<<<<<<< HEAD
     delete: deleteRecord.bind(null, knex, tableName),
 >>>>>>> 241bdeb (api-authentication: add new migrations, auth middleware to endpoints and passport strategy)
+=======
+    delete: deleteRecord.bind(null, knex, tableName)
+>>>>>>> 8fe263c (Fixed linting of transition-backend and chaire-lib-backend with yarn format)
 };
