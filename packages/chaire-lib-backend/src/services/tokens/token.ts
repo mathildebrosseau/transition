@@ -7,4 +7,6 @@
 export type TokenAttributes = {
     id: number;
     api_token?: string | null;
+    expiry_date,
+    creation_date,
 };
