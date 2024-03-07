@@ -10,6 +10,7 @@ import TrError from 'chaire-lib-common/lib/utils/TrError';
 import { randomUUID } from 'crypto';
 import { TokenAttributes } from '../../services/auth/token';
 
+
 const tableName = 'tokens';
 const userTableName = 'users';
 
@@ -25,6 +26,7 @@ const attributesCleaner = function (attributes: TokenAttributes): { user_id: num
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 const attributesParser = (dbAttributes: { user_id: number; api_token: string }): TokenAttributes => ({
     user_id: dbAttributes.user_id,
 =======
@@ -38,6 +40,13 @@ const attributesParser = (dbAttributes: { id: number; api_token: string }): Toke
     id: dbAttributes.id,
 >>>>>>> 241bdeb (api-authentication: add new migrations, auth middleware to endpoints and passport strategy)
     api_token: dbAttributes.api_token
+=======
+const attributesParser = (dbAttributes: { id: number; apiToken: string; expiryDate:string; creationDate:string }): TokenAttributes => ({
+    id: dbAttributes.id,
+    api_token: dbAttributes.apiToken,
+    expiry_date: dbAttributes.expiryDate,
+    creation_date: dbAttributes.creationDate
+>>>>>>> 4416698 (modify parser)
 });
 
 const getOrCreate = async (usernameOrEmail: string): Promise<string> => {
@@ -76,6 +85,7 @@ const getOrCreate = async (usernameOrEmail: string): Promise<string> => {
                     return row[0].id;
                 }
             });
+<<<<<<< HEAD
 <<<<<<< HEAD
         const row = await knex(tableName).where('user_id', user_id);
         if (row[0]) {
@@ -140,11 +150,15 @@ const getUserByToken = async (token: string) => {
 =======
         const apiToken = randomUUID();
         const newObject: TokenAttributes = { id: id, api_token: apiToken };
+=======
+>>>>>>> 4416698 (modify parser)
         const row = await knex(tableName).where('id', id);
 >>>>>>> 8fe263c (Fixed linting of transition-backend and chaire-lib-backend with yarn format)
         if (row[0]) {
             return row[0].api_token;
         }
+        const apiToken = randomUUID();
+        const newObject: TokenAttributes = { id: id, api_token: apiToken, expiry_date: knex.raw("CURRENT_TIMESTAMP - interval '1 week'"), creation_date: knex.raw('CURRENT_TIMESTAMP')};
         await knex(tableName).insert(newObject);
         return apiToken;
     } catch (error) {
@@ -257,6 +271,25 @@ const getUserByToken = async (token: string) => {
 };
 >>>>>>> 8fe263c (Fixed linting of transition-backend and chaire-lib-backend with yarn format)
 
+const cleanExpiredApiTokens = async () => {
+    try {
+        const rowsToDelete = await knex(tableName)
+        console.log("TRY")
+        console.log(rowsToDelete)
+        console.log(rowsToDelete.values)
+        console.log("BYE")
+        for (var row in rowsToDelete) {
+            deleteRecord(knex, tableName, row['id'])
+        }
+    } catch (error) {
+        console.log("shits weird")
+        throw new TrError(
+            `Cannot cleanup expired tokens from table ${tableName} (knex error: ${error})`,
+            'DatabaseCleanupDatabaseApiTokensTokenBecauseDatabaseError'
+        );
+    }
+};
+
 export default {
     getOrCreate,
     update,
@@ -270,9 +303,14 @@ export default {
     exists: exists.bind(null, knex, tableName),
     read,
 <<<<<<< HEAD
+<<<<<<< HEAD
     delete: deleteRecord.bind(null, knex, tableName),
 >>>>>>> 241bdeb (api-authentication: add new migrations, auth middleware to endpoints and passport strategy)
 =======
     delete: deleteRecord.bind(null, knex, tableName)
 >>>>>>> 8fe263c (Fixed linting of transition-backend and chaire-lib-backend with yarn format)
+=======
+    delete: deleteRecord.bind(null, knex, tableName),
+    cleanExpiredApiTokens,
+>>>>>>> 4416698 (modify parser)
 };
