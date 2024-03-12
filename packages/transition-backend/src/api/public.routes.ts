@@ -14,7 +14,8 @@ import osrmProcessManager from 'chaire-lib-backend/lib/utils/processManagers/OSR
 import osrmService from 'chaire-lib-backend/lib/utils/osrm/OSRMService';
 import trRoutingProcessManager from 'chaire-lib-backend/lib/utils/processManagers/TrRoutingProcessManager';
 import trRoutingService from 'chaire-lib-backend/lib/utils/trRouting/TrRoutingServiceBackend';
-
+import { TransitRoutingCalculator } from 'transition-common/lib/services/transitRouting/TransitRoutingCalculator';
+import TransitRouting, { TransitRoutingAttributes } from 'transition-common/lib/services/transitRouting/TransitRouting';
 
 
 export default function (app: express.Express, passport: PassportStatic) {
@@ -51,23 +52,26 @@ export default function (app: express.Express, passport: PassportStatic) {
     });
 
     router.get('/route/:withGeometry?', async (req, res) => {
-        const routingParameters = req.body.routingParameters;
+        // const routingParameters = req.body.routingParameters;
         if ((await trRoutingProcessManager.status({})).status === "not_running") {
             await trRoutingProcessManager.restart({});
         }
-
-        const routingResults = await trRoutingService.route(routingParameters);
-        const parameters = {
-            mode: req.body.mode,
-            points: routingParameters.originDestination
-        };
         
-        if (req.params.withGeometry !== 'false') {
-            const routingResultsGeoJson = await osrmService.route(parameters);
-            res.json({ routingResults: routingResults, routingResultsGeoJson: routingResultsGeoJson });
-        } else {
-            res.json(routingResults);
-        }
+        const result = await TransitRoutingCalculator.calculate(new TransitRouting(req.body), false, {});
+        res.json(result);
+
+        // const routingResults = await trRoutingService.route(routingParameters);
+        // const parameters = {
+        //     mode: req.body.mode,
+        //     points: routingParameters.originDestination
+        // };
+        
+        // if (req.params.withGeometry !== 'false') {
+        //     const routingResultsGeoJson = await osrmService.route(parameters);
+        //     res.json({ routingResults: routingResults, routingResultsGeoJson: routingResultsGeoJson });
+        // } else {
+        //     res.json(routingResults);
+        // }
     });
 
     app.use('/api', router);
