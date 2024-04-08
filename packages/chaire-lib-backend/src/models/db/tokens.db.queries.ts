@@ -13,6 +13,7 @@ import { TokenAttributes } from '../../services/auth/token';
 
 const tableName = 'tokens';
 const userTableName = 'users';
+const tokenLifespanDays = 7
 
 const attributesCleaner = function (attributes: TokenAttributes): { user_id: number; api_token: string } {
     const { user_id, api_token } = attributes;
@@ -158,7 +159,9 @@ const getUserByToken = async (token: string) => {
             return row[0].api_token;
         }
         const apiToken = randomUUID();
-        const newObject: TokenAttributes = { id: id, api_token: apiToken, expiry_date: knex.raw("CURRENT_TIMESTAMP - interval '1 week'"), creation_date: knex.raw('CURRENT_TIMESTAMP')};
+        const tokenLifespan = new Date();
+        tokenLifespan.setDate(tokenLifespan.getDate() + tokenLifespanDays)
+        const newObject: TokenAttributes = { id: id, api_token: apiToken, expiry_date: tokenLifespan, creation_date: knex.raw('CURRENT_TIMESTAMP')};
         await knex(tableName).insert(newObject);
         return apiToken;
     } catch (error) {
@@ -271,18 +274,15 @@ const getUserByToken = async (token: string) => {
 };
 >>>>>>> 8fe263c (Fixed linting of transition-backend and chaire-lib-backend with yarn format)
 
-const cleanExpiredApiTokens = async () => {
+async function cleanExpiredApiTokens(){
     try {
-        const rowsToDelete = await knex(tableName)
-        console.log("TRY")
-        console.log(rowsToDelete)
-        console.log(rowsToDelete.values)
-        console.log("BYE")
-        for (var row in rowsToDelete) {
-            deleteRecord(knex, tableName, row['id'])
+        const tokenLifespan = new Date();
+        tokenLifespan.setDate(tokenLifespan.getDate() - tokenLifespanDays)
+        const rowsToDelete = await knex(tableName).where('expiry_date','<', tokenLifespan)
+        for (var row of rowsToDelete) {
+            await deleteRecord(knex, tableName, row['id'])
         }
     } catch (error) {
-        console.log("shits weird")
         throw new TrError(
             `Cannot cleanup expired tokens from table ${tableName} (knex error: ${error})`,
             'DatabaseCleanupDatabaseApiTokensTokenBecauseDatabaseError'
